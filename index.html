@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>소장님 전용 바둑/오목</title>
+  <title>주인님의 바둑</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#c49a6c" />
   <style>
     :root{
       --bg:#0b0f14;
@@ -21,330 +23,590 @@
     *{ box-sizing:border-box; }
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-      background: var(--bg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 50% -20%, rgba(120,160,255,.18), transparent 60%),
+                  linear-gradient(180deg, #0b0f14, #070a0f);
+      color:var(--text);
+      min-height:100svh;
+      display:flex;
+      justify-content:center;
+      padding: 16px 12px 24px;
+    }
+    .app{
+      width:min(520px, 100%);
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      padding: 10px 12px;
+      background: rgba(17,24,38,.7);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .title .h{
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+    }
+    .title .sub{
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .turn{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 999px;
+      user-select:none;
+    }
+    .dot{
+      width:14px; height:14px; border-radius:50%;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,.25), 0 2px 10px rgba(0,0,0,.4);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .dot.black{ background:#111; border-color: rgba(255,255,255,.12); }
+    .dot.white{ background:#f3f3f3; border-color: rgba(0,0,0,.12); }
+    .turn span{ font-size: 13px; color: var(--text); }
+
+    .boardWrap{
+      background: linear-gradient(145deg, var(--wood), var(--wood2));
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,.18);
+    }
+
+    /* 정사각형 유지 */
+    .square{
+      width:100%;
+      aspect-ratio: 1 / 1;
+      position:relative;
+      border-radius: 14px;
+      overflow:hidden;
+      touch-action: manipulation;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), transparent 30%),
+                  radial-gradient(800px 800px at 70% 10%, rgba(0,0,0,.12), transparent 55%);
+    }
+
+    canvas{
+      width:100%;
+      height:100%;
+      display:block;
+    }
+
+    .bar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      padding: 10px 12px;
+      background: rgba(17,24,38,.7);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .btns{
+      display:flex;
+      gap:10px;
+      flex: 1 1 auto;
+      flex-wrap:wrap;
+    }
+    button{
+      appearance:none;
+      border:none;
+      outline:none;
       color: var(--text);
-      display: flex; flex-direction: column; align-items: center;
-      min-height: 100vh; overflow-x: hidden;
+      background: linear-gradient(180deg, var(--btn2), var(--btn));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.25);
+      cursor:pointer;
+      user-select:none;
     }
-    header{ width:100%; padding: 20px 20px 10px; max-width: 600px; display:flex; justify-content:space-between; align-items:center;}
-    h1{ font-size:1.4rem; margin:0; font-weight:700; color:var(--text); letter-spacing:-0.02em;}
-    
-    .status-bar{
-      width:90%; max-width:600px; background:var(--panel); border-radius:var(--radius);
-      padding:15px 20px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;
-      box-shadow:var(--shadow);
+    button:active{
+      transform: translateY(1px);
+      filter: brightness(.98);
     }
-    .turn-info{ display:flex; align-items:center; gap:10px; font-weight:600;}
-    .dot{ width:12px; height:12px; border-radius:50%; }
-    .black-dot{ background:#000; border:1px solid rgba(255,255,255,0.2); }
-    .white-dot{ background:#fff; border:1px solid rgba(0,0,0,0.1); }
-    
-    .board-container{
-      position:relative; width:95vw; height:95vw; max-width:600px; max-height:600px;
-      background: var(--wood); border-radius: 8px; box-shadow: var(--shadow);
-      display:flex; align-items:center; justify-content:center; padding:10px;
-      border: 4px solid var(--wood2);
+    .hint{
+      font-size: 12px;
+      color: var(--muted);
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-left:auto;
     }
-    canvas{ width:100%; height:100%; touch-action:none; cursor:crosshair; }
-
-    .btn-group{
-      width:90%; max-width:600px; margin-top:20px; display:grid; grid-template-columns: 1fr 1fr; gap:10px; padding-bottom:40px;
+    .hint kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      padding: 3px 6px;
+      border-radius: 8px;
+      color: var(--text);
     }
-    .btn{
-      border:none; border-radius:12px; padding:14px; font-size:0.95rem; font-weight:600;
-      color:var(--text); background:var(--btn); cursor:pointer; transition:all 0.2s;
-      display:flex; align-items:center; justify-content:center; gap:8px;
-    }
-    .btn:active{ transform:scale(0.96); opacity:0.8; }
-    .btn.secondary{ background: var(--btn2); }
-    .btn.danger{ background: rgba(239, 68, 68, 0.2); color:#f87171; grid-column: span 2; }
-    .mode-active { background: #c49a6c !important; color: #000 !important; }
-
-    .caps-info{ font-size:0.85rem; color:var(--muted); }
   </style>
+
 </head>
 <body>
+  <div class="app">
+    <header>
+      <div class="title">
+        <div class="h">주인님의 바둑 (19×19)</div>
+        <div class="sub">친구랑 번갈아 두기 · 새 게임 · 되돌리기 · 패스</div>
+      </div>
+      <div class="turn" id="turnPill" title="현재 차례">
+        <div class="dot black" id="turnDot"></div>
+        <span id="turnText">흑 차례</span>
+      </div>
+    </header>
 
-<header>
-  <h1 id="appTitle">주인님의 바둑</h1>
-  <div class="caps-info">
-    흑 잡음: <span id="capBlack">0</span> / 백 잡음: <span id="capWhite">0</span>
+    <div class="boardWrap">
+      <div class="square">
+        <canvas id="board"></canvas>
+      </div>
+    </div>
+
+    <div class="bar">
+      <div class="btns">
+        <button id="newGameBtn">새 게임</button>
+        <button id="undoBtn">한 수 되돌리기</button>
+        <button id="passBtn">패스</button>
+      </div>
+<div class="sub" style="margin-top:6px; color: rgba(231,238,252,.75); font-size:12px;">
+  잡은 돌 — 흑: <b id="capBlack">0</b> · 백: <b id="capWhite">0</b>
+</div>
+
+      <div class="hint">
+        <span>팁:</span>
+        <kbd>탭</kbd><span>으로 착수</span>
+      </div>
+    </div>
   </div>
-</header>
-
-<div class="status-bar">
-  <div class="turn-info">
-    <div id="turnDot" class="dot black-dot"></div>
-    <span id="turnText">흑의 차례</span>
-  </div>
-  <div id="modeDisplay" style="font-size:0.8rem; opacity:0.7;">현재 모드: 바둑</div>
-</div>
-
-<div class="board-container">
-  <canvas id="goBoard"></canvas>
-</div>
-
-<div class="btn-group">
-  <button id="modeBtn" class="btn">🔁 모드 전환: 오목</button>
-  <button id="undoBtn" class="btn secondary">한 수 되돌리기</button>
-  <button id="passBtn" class="btn secondary">패스</button>
-  <button id="resetBtn" class="btn danger">판 비우기</button>
-</div>
 
 <script>
-  const canvas = document.getElementById('goBoard');
-  const ctx = canvas.getContext('2d');
-  const SIZE = 19;
-  const EMPTY = 0, BLACK = 1, WHITE = 2;
-  
-  let board = Array.from({length:SIZE}, () => Array(SIZE).fill(EMPTY));
-  let turn = BLACK;
-  let history = [];
-  let captures = { black: 0, white: 0 };
-  let isOmokMode = false; // 초기값 바둑
-
-  function init() {
-    const saved = localStorage.getItem("go19_v2_state");
-    if(saved) {
-      const data = JSON.parse(saved);
-      board = data.board;
-      turn = data.turn;
-      history = data.history || [];
-      captures = data.captures || {black:0, white:0};
-      isOmokMode = !!data.isOmokMode;
-    }
-    updateUI();
-    resize();
-    window.addEventListener('resize', resize);
+(() => {
+  // ====== PWA: Service Worker 등록 ======
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
   }
 
-  function resize() {
+  // ====== 바둑판 상태 ======
+  const SIZE = 19; // 19x19
+  const EMPTY = 0, BLACK = 1, WHITE = 2;
+
+
+
+// ====== 사운드 (짧게 잘라 재생) ======
+// 같은 폴더에 place.mp3, capture.mp3 를 두세요.
+const SFX = {
+  enabled: true,
+  placeSrc: "./place.mp3",
+  captureSrc: "./capture.mp3",
+  // 34초짜리 파일이어도 앞부분만 "짧게" 재생하면 됩니다.
+  placeMs: 600,    // 착수 소리 길이(ms) - 취향대로 조절
+  captureMs: 600,  // 따먹기 소리 길이(ms)
+  volume: 0.7    // 0.0 ~ 1.0
+};
+
+function playSfx(src, ms){
+  if (!SFX.enabled) return;
+  try{
+    const a = new Audio(src);
+    a.preload = "auto";
+    a.volume = SFX.volume;
+    // 사용자 제스처(pointerup) 안에서 호출되므로 모바일에서도 보통 재생됩니다.
+    a.currentTime = 0;
+    const p = a.play();
+    // 일부 브라우저는 play()가 Promise를 반환합니다.
+    if (p && typeof p.catch === "function") p.catch(() => {});
+    // ms 이후 강제 종료(긴 음원도 짧게 끊어쓰기)
+    setTimeout(() => {
+      try{ a.pause(); a.currentTime = 0; }catch(e){}
+    }, ms);
+  }catch(e){}
+}
+
+  let board = Array.from({length: SIZE}, () => Array(SIZE).fill(EMPTY));
+let captures = { black: 0, white: 0 };
+
+const capBlackEl = document.getElementById("capBlack");
+const capWhiteEl = document.getElementById("capWhite");
+function updateCapsUI(){
+  if (capBlackEl) capBlackEl.textContent = String(captures.black);
+  if (capWhiteEl) capWhiteEl.textContent = String(captures.white);
+}
+
+  let turn = BLACK;
+  let history = []; // {x,y,turn}
+
+  // ====== 캔버스 ======
+  const canvas = document.getElementById("board");
+  const ctx = canvas.getContext("2d");
+
+  // DPR 대응(선명)
+  function fitCanvas() {
+    const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.parentElement.getBoundingClientRect();
-    const side = Math.min(rect.width, rect.height) - 20;
-    canvas.width = side * dpr;
-    canvas.height = side * dpr;
-    ctx.scale(dpr, dpr);
-    canvas.style.width = side + 'px';
-    canvas.style.height = side + 'px';
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     draw();
+  }
+
+  // 격자 파라미터
+  function geom() {
+    const w = canvas.getBoundingClientRect().width;
+    const h = canvas.getBoundingClientRect().height;
+    const pad = Math.min(w, h) * 0.025;         // 바깥 여백
+    const inner = Math.min(w, h) - pad * 2;    // 실제 격자 영역
+    const step = inner / (SIZE - 1);
+    const ox = (w - inner) / 2;
+    const oy = (h - inner) / 2;
+    return {w, h, pad, inner, step, ox, oy};
   }
 
   function draw() {
-    const s = canvas.clientWidth;
-    const padding = s / (SIZE + 1);
-    const spacing = (s - padding * 2) / (SIZE - 1);
-    
-    ctx.clearRect(0,0,s,s);
-    ctx.strokeStyle = "rgba(0,0,0,0.6)";
+    const {w, h, step, ox, oy} = geom();
+    ctx.clearRect(0, 0, w, h);
+
+    // 격자 선
     ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(0,0,0,.65)";
+    ctx.beginPath();
+    for (let i = 0; i < SIZE; i++) {
+      const x = ox + i * step;
+      const y = oy + i * step;
 
-    // 선 그리기
-    for(let i=0; i<SIZE; i++) {
-      ctx.beginPath();
-      ctx.moveTo(padding + i*spacing, padding);
-      ctx.lineTo(padding + i*spacing, s - padding);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(padding, padding + i*spacing);
-      ctx.lineTo(s - padding, padding + i*spacing);
-      ctx.stroke();
+      // 세로
+      ctx.moveTo(x, oy);
+      ctx.lineTo(x, oy + (SIZE - 1) * step);
+      // 가로
+      ctx.moveTo(ox, y);
+      ctx.lineTo(ox + (SIZE - 1) * step, y);
     }
+    ctx.stroke();
 
-    // 화점(Star points)
-    const stars = [3, 9, 15];
-    ctx.fillStyle = "rgba(0,0,0,0.7)";
-    stars.forEach(r => stars.forEach(c => {
-      ctx.beginPath();
-      ctx.arc(padding + c*spacing, padding + r*spacing, 3, 0, Math.PI*2);
-      ctx.fill();
-    }));
-
-    // 돌 그리기
-    for(let y=0; y<SIZE; y++){
-      for(let x=0; x<SIZE; x++){
-        if(board[y][x] !== EMPTY){
-          const cx = padding + x*spacing;
-          const cy = padding + y*spacing;
-          ctx.beginPath();
-          ctx.arc(cx, cy, spacing*0.45, 0, Math.PI*2);
-          ctx.fillStyle = board[y][x] === BLACK ? "#111" : "#fff";
-          ctx.shadowBlur = 4; ctx.shadowColor = "rgba(0,0,0,0.3)";
-          ctx.fill();
-          ctx.shadowBlur = 0;
-          if(board[y][x] === WHITE) { ctx.strokeStyle="#ccc"; ctx.stroke(); }
-        }
-      }
-    }
-
-    // 마지막 수 표시 (빨간 점)
-    if(history.length > 0) {
-      const last = history[history.length-1];
-      if(!last.pass && last.x !== -1) {
-        ctx.fillStyle = "#ff4444";
+    // 화점(9개)
+    const starPoints = [3, 9, 15];
+    ctx.fillStyle = "rgba(0,0,0,.75)";
+    for (const i of starPoints) {
+      for (const j of starPoints) {
+        const x = ox + i * step;
+        const y = oy + j * step;
         ctx.beginPath();
-        ctx.arc(padding + last.x*spacing, padding + last.y*spacing, 4, 0, Math.PI*2);
+        ctx.arc(x, y, step * 0.10, 0, Math.PI * 2);
         ctx.fill();
       }
     }
+
+    // 돌 그리기
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        const v = board[y][x];
+        if (v === EMPTY) continue;
+        drawStone(x, y, v);
+      }
+    }
+
+    // 마지막 수 표시(빨간 점)
+    const last = history[history.length - 1];
+    if (last && !last.pass) {
+      const {x, y} = last;
+      const {step, ox, oy} = geom();
+      const cx = ox + x * step;
+      const cy = oy + y * step;
+      ctx.fillStyle = "rgba(220,40,40,.9)";
+      ctx.beginPath();
+      ctx.arc(cx, cy, step * 0.12, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
+function inBounds(x, y){ return x >= 0 && x < SIZE && y >= 0 && y < SIZE; }
 
-  canvas.addEventListener('click', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const s = rect.width;
-    const padding = s / (SIZE + 1);
-    const spacing = (s - padding * 2) / (SIZE - 1);
-    const x = Math.round((e.clientX - rect.left - padding) / spacing);
-    const y = Math.round((e.clientY - rect.top - padding) / spacing);
+function neighbors(x, y){
+  return [
+    [x-1, y], [x+1, y],
+    [x, y-1], [x, y+1]
+  ].filter(([nx, ny]) => inBounds(nx, ny));
+}
 
-    if(x >= 0 && x < SIZE && y >= 0 && y < SIZE && board[y][x] === EMPTY) {
-      board[y][y] = EMPTY; // 혹시 모를 에러 방지
-      board[y][x] = turn;
+function getGroupAndLiberties(x, y){
+  const color = board[y][x];
+  const stack = [[x, y]];
+  const visited = new Set([`${x},${y}`]);
+  const stones = [];
+  let liberties = 0;
 
-      let captured = [];
-      if(!isOmokMode) { // 바둑 모드일 때만 캡처 확인
-        captured = getCaptured(x, y, turn);
-        if(captured.length === 0 && isSuicide(x, y, turn)) {
-          board[y][x] = EMPTY;
-          alert("자살수입니다!");
-          return;
+  while (stack.length){
+    const [cx, cy] = stack.pop();
+    stones.push([cx, cy]);
+
+    for (const [nx, ny] of neighbors(cx, cy)){
+      const v = board[ny][nx];
+      if (v === EMPTY){
+        liberties++;
+      } else if (v === color){
+        const key = `${nx},${ny}`;
+        if (!visited.has(key)){
+          visited.add(key);
+          stack.push([nx, ny]);
         }
-        captured.forEach(([cx, cy]) => {
-          board[cy][cx] = EMPTY;
-          if(turn === BLACK) captures.black++; else captures.white++;
-        });
-      }
-
-      history.push({x, y, turn, removed: captured, isOmok: isOmokMode});
-      turn = (turn === BLACK) ? WHITE : BLACK;
-      updateUI();
-      saveToLocal();
-      draw();
-    }
-  });
-
-  // 바둑 로직 (캡처 확인)
-  function getCaptured(x, y, color) {
-    const opp = (color === BLACK) ? WHITE : BLACK;
-    let totalRemoved = [];
-    [[0,1],[0,-1],[1,0],[-1,0]].forEach(([dx, dy]) => {
-      const nx = x + dx, ny = y + dy;
-      if(nx>=0 && nx<SIZE && ny>=0 && ny<SIZE && board[ny][nx] === opp) {
-        const group = getGroup(nx, ny);
-        if(!hasLiberty(group)) totalRemoved = totalRemoved.concat(group);
-      }
-    });
-    return totalRemoved;
-  }
-
-  function getGroup(x, y) {
-    const color = board[y][x];
-    const group = [];
-    const visited = new Set();
-    const stack = [[x, y]];
-    while(stack.length) {
-      const [cx, cy] = stack.pop();
-      const key = `${cx},${cy}`;
-      if(!visited.has(key)) {
-        visited.add(key);
-        group.push([cx, cy]);
-        [[0,1],[0,-1],[1,0],[-1,0]].forEach(([dx, dy]) => {
-          const nx = cx + dx, ny = cy + dy;
-          if(nx>=0 && nx<SIZE && ny>=0 && ny<SIZE && board[ny][nx] === color) stack.push([nx, ny]);
-        });
       }
     }
-    return group;
   }
+  return { color, stones, liberties };
+}
 
-  function hasLiberty(group) {
-    for(const [gx, gy] of group) {
-      const dirs = [[0,1],[0,-1],[1,0],[-1,0]];
-      for(const [dx, dy] of dirs) {
-        const nx = gx + dx, ny = gy + dy;
-        if(nx>=0 && nx<SIZE && ny>=0 && ny<SIZE && board[ny][nx] === EMPTY) return true;
-      }
-    }
-    return false;
-  }
+function removeStones(stones){
+  for (const [x, y] of stones) board[y][x] = EMPTY;
+}
 
-  function isSuicide(x, y, color) {
-    const group = getGroup(x, y);
-    return !hasLiberty(group);
-  }
+  function drawStone(x, y, color) {
+    const {step, ox, oy} = geom();
+    const cx = ox + x * step;
+    const cy = oy + y * step;
+    const r = step * 0.46;
 
-  // UI 업데이트
-  function updateUI() {
-    document.getElementById("turnDot").className = "dot " + (turn === BLACK ? "black-dot" : "white-dot");
-    document.getElementById("turnText").innerText = (turn === BLACK ? "흑" : "백") + "의 차례";
-    document.getElementById("capBlack").innerText = captures.black;
-    document.getElementById("capWhite").innerText = captures.white;
-    
-    const modeBtn = document.getElementById("modeBtn");
-    const appTitle = document.getElementById("appTitle");
-    const modeDisplay = document.getElementById("modeDisplay");
-
-    if(isOmokMode) {
-      modeBtn.innerText = "🔁 모드 전환: 바둑";
-      appTitle.innerText = "주인님의 오목";
-      modeDisplay.innerText = "현재 모드: 오목 (잡기 불가)";
+    // 돌 그라데이션(심플)
+    const g = ctx.createRadialGradient(cx - r*0.3, cy - r*0.3, r*0.2, cx, cy, r);
+    if (color === BLACK) {
+      g.addColorStop(0, "rgba(90,90,90,.9)");
+      g.addColorStop(0.4, "rgba(25,25,25,.95)");
+      g.addColorStop(1, "rgba(0,0,0,1)");
+      ctx.strokeStyle = "rgba(255,255,255,.10)";
     } else {
-      modeBtn.innerText = "🔁 모드 전환: 오목";
-      appTitle.innerText = "주인님의 바둑";
-      modeDisplay.innerText = "현재 모드: 바둑";
+      g.addColorStop(0, "rgba(255,255,255,1)");
+      g.addColorStop(0.5, "rgba(240,240,240,1)");
+      g.addColorStop(1, "rgba(210,210,210,1)");
+      ctx.strokeStyle = "rgba(0,0,0,.10)";
+    }
+
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // ====== 턴 UI ======
+  const turnDot = document.getElementById("turnDot");
+  const turnText = document.getElementById("turnText");
+
+  function updateTurnUI() {
+    if (turn === BLACK) {
+      turnDot.className = "dot black";
+      turnText.textContent = "흑 차례";
+    } else {
+      turnDot.className = "dot white";
+      turnText.textContent = "백 차례";
     }
   }
 
-  function saveToLocal() {
-    localStorage.setItem("go19_v2_state", JSON.stringify({board, turn, history, captures, isOmokMode}));
+  // ====== 입력(터치/클릭) ======
+function getCellFromEvent(ev) {
+  const rect = canvas.getBoundingClientRect();
+  const {step, ox, oy} = geom();
+
+  // pointer 이벤트는 ev.clientX/Y가 항상 있음
+  const clientX = ev.clientX;
+  const clientY = ev.clientY;
+
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+
+  const gx = Math.round((x - ox) / step);
+  const gy = Math.round((y - oy) / step);
+
+  if (gx < 0 || gx >= SIZE || gy < 0 || gy >= SIZE) return null;
+
+  const px = ox + gx * step;
+  const py = oy + gy * step;
+  const dist = Math.hypot(x - px, y - py);
+  if (dist > step * 0.55) return null;
+
+  return {x: gx, y: gy};
+}
+
+ 
+
+function placeStone(x, y) {
+  if (board[y][x] !== EMPTY) return;
+
+  const me = turn;
+  const opp = (me === BLACK) ? WHITE : BLACK;
+
+  // 1) 일단 둔다
+  board[y][x] = me;
+
+  // 2) 상대 인접 그룹 중 숨(자유도) 0인 것 포획
+  const removed = []; // 이번 수로 잡힌 돌 좌표들
+  for (const [nx, ny] of neighbors(x, y)) {
+    if (board[ny][nx] !== opp) continue;
+    const g = getGroupAndLiberties(nx, ny);
+    if (g.liberties === 0) {
+      removed.push(...g.stones);
+    }
   }
 
-  // 버튼 이벤트
-  document.getElementById("modeBtn").addEventListener("click", () => {
-    isOmokMode = !isOmokMode;
-    updateUI();
-    saveToLocal();
-  });
+  // 실제 제거(중복 제거)
+  const uniq = new Map();
+  for (const [rx, ry] of removed) uniq.set(`${rx},${ry}`, [rx, ry]);
+  const removedUniq = Array.from(uniq.values());
+  if (removedUniq.length) removeStones(removedUniq);
 
-  document.getElementById("undoBtn").addEventListener("click", () => {
-    if(history.length === 0) return;
-    const last = history.pop();
-    board[last.y][last.x] = EMPTY;
-    if(last.removed) {
-      const opp = (last.turn === BLACK) ? WHITE : BLACK;
-      last.removed.forEach(([rx, ry]) => {
-        board[ry][rx] = opp;
-        if(last.turn === BLACK) captures.black--; else captures.white--;
-      });
-    }
-    turn = last.turn;
-    updateUI();
+  // 3) 자살수(자기 그룹 숨 0) 방지: 포획 후에도 숨이 0이면 무효
+  const myGroup = getGroupAndLiberties(x, y);
+  if (myGroup.liberties === 0) {
+    // 되돌림
+    board[y][x] = EMPTY;
+    // 상대 돌 원복
+    for (const [rx, ry] of removedUniq) board[ry][rx] = opp;
+    return;
+  }
+
+  // 4) 캡처 카운트 반영
+  const capCount = removedUniq.length;
+  if (capCount > 0) {
+    if (me === BLACK) captures.black += capCount;
+    else captures.white += capCount;
+    playSfx(SFX.captureSrc, SFX.captureMs);
+  }
+
+  // 5) 히스토리 기록(undo를 위해 잡힌 돌도 기록)
+  history.push({ x, y, turn: me, removed: removedUniq, capCount });
+
+  // 6) 턴 전환
+  turn = (turn === BLACK) ? WHITE : BLACK;
+
+  updateTurnUI();
+  updateCapsUI();
+  playSfx(SFX.placeSrc, SFX.placeMs);
+  saveToLocal();
+  draw();
+}
+
+// 모바일/데스크탑 통합: Pointer Events
+canvas.addEventListener("pointerup", (ev) => {
+  ev.preventDefault();
+  const cell = getCellFromEvent(ev);
+  if (!cell) return;
+  placeStone(cell.x, cell.y);
+});
+
+  // ====== 버튼들 ======
+  document.getElementById("newGameBtn").addEventListener("click", () => {
+    if (!confirm("새 게임을 시작할까요? (현재 판은 사라집니다)")) return;
+    board = Array.from({length: SIZE}, () => Array(SIZE).fill(EMPTY));
+    turn = BLACK;
+    history = [];
+    updateTurnUI();
     saveToLocal();
+captures = { black: 0, white: 0 };
+updateCapsUI();
     draw();
   });
+
+document.getElementById("undoBtn").addEventListener("click", () => {
+  const last = history.pop();
+  if (!last) return;
+
+  // 패스였다면: 턴만 되돌림
+  if (last.pass) {
+    turn = last.turn;
+    updateTurnUI();
+    updateCapsUI();
+    saveToLocal();
+    draw();
+    return;
+  }
+
+  // 착수 돌 제거
+  board[last.y][last.x] = EMPTY;
+
+  // 잡힌 돌 복원
+  const opp = (last.turn === BLACK) ? WHITE : BLACK;
+  if (last.removed && last.removed.length) {
+    for (const [rx, ry] of last.removed) board[ry][rx] = opp;
+
+    // 캡처 카운트 되돌림
+    if (last.turn === BLACK) captures.black -= last.removed.length;
+    else captures.white -= last.removed.length;
+  }
+
+  // 그 수를 뒀던 사람이 다시 차례
+  turn = last.turn;
+
+  updateTurnUI();
+  updateCapsUI();
+  saveToLocal();
+  draw();
+});
+
 
   document.getElementById("passBtn").addEventListener("click", () => {
-    history.push({x: -1, y: -1, turn, pass: true});
+    // 패스는 히스토리에 기록(되돌리기 가능)
+    history.push({x: -1, y: -1, turn, pass:true});
     turn = (turn === BLACK) ? WHITE : BLACK;
-    updateUI();
+    updateTurnUI();
+    updateCapsUI();
     saveToLocal();
     draw();
   });
 
-  document.getElementById("resetBtn").addEventListener("click", () => {
-    if(confirm("판을 비울까요?")) {
-      board = Array.from({length:SIZE}, () => Array(SIZE).fill(EMPTY));
-      history = [];
-      captures = {black:0, white:0};
-      turn = BLACK;
-      saveToLocal();
-      updateUI();
-      draw();
-    }
-  });
+  // ====== 저장/복원(폰에 넣고 다닐 때 중요) ======
+  const KEY = "go19_v1_state";
+function saveToLocal(){
+  try{
+    localStorage.setItem(KEY, JSON.stringify({board, turn, history, captures}));
+  }catch(e){}
+}
 
-  init();
+function loadFromLocal(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    if(!s || !s.board || !s.history) return;
+
+    board = s.board;
+    turn = s.turn ?? BLACK;
+    history = s.history ?? [];
+    captures = s.captures ?? { black: 0, white: 0 };
+  }catch(e){}
+}
+
+
+  // ====== 초기화 ======
+  loadFromLocal();
+  updateTurnUI();
+  updateCapsUI();
+  fitCanvas();
+  window.addEventListener("resize", fitCanvas);
+})();
 </script>
 </body>
 </html>
