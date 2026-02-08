@@ -220,7 +220,7 @@
     }
   }
 
-  canvas.addEventListener('mousedown', (e) => {
+canvas.addEventListener('mousedown', (e) => {
     const rect = canvas.getBoundingClientRect();
     const s = rect.width;
     const padding = s / (SIZE + 1);
@@ -232,6 +232,11 @@
       let tempBoard = board.map(row => [...row]);
       board[y][x] = turn;
 
+      // [소리 추가] 일단 돌을 놓았으니 착수음 재생!
+      const placeSound = document.getElementById('placeSound');
+      placeSound.currentTime = 0;
+      placeSound.play();
+
       if (!isOmok) {
         let captured = checkCaptures(x, y, turn);
         if (captured.length === 0 && isSuicide(x, y, turn)) {
@@ -239,6 +244,14 @@
           alert("자살수입니다!");
           return;
         }
+
+        // [소리 추가] 만약 잡힌 돌이 있다면 '잡기 소리'로 덮어쓰기!
+        if (captured.length > 0) {
+          const captureSound = document.getElementById('captureSound');
+          captureSound.currentTime = 0;
+          captureSound.play();
+        }
+
         captured.forEach(p => {
           board[p.y][p.x] = 0;
           captures[turn]++;
@@ -256,7 +269,6 @@
       draw();
     }
   });
-
   function getGroup(x, y, color) {
     let group = [];
     let stack = [{x, y}];
@@ -392,5 +404,7 @@
     <a href="mailto:ezzone00@gmail.com" style="color: #666; text-decoration: none;">문의하기</a>
   </p>
 </footer>
+<audio id="placeSound" src="place.mp3" preload="auto"></audio>
+<audio id="captureSound" src="capture.mp3" preload="auto"></audio>  
 </body>
 </html>
