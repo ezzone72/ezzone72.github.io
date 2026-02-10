@@ -38,9 +38,26 @@
 </div>
 
 <div class="game-section">
-  <h1>내 손안의 바둑판</h1>
-  <div id="status">흑의 차례 (바둑) | 잡은 돌 - 흑: 0 백: 0</div>
-  <div class="board-container">
+<div class="game-section">
+  <h1 style="color: var(--accent); margin-bottom: 5px;">내 손안의 바둑판 (Hand-Go)</h1>
+  <p style="font-size: 0.9rem; color: #888; margin-top: 0; margin-bottom: 20px;">AI와 인간이 협업하여 만든 디지털 수담(手談) 공간</p>
+
+  <div class="developer-note" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px; text-align: left;">
+    <strong>🚀 개발자 노트: "왜 이 서비스를 만들었나?"</strong><br>
+    안녕하세요, <strong>aisojang.tistory.com</strong>을 운영 중인 개발자입니다. 본 서비스는 현대인의 복잡한 일상 속에서 잠시 숫자를 내려놓고, 바둑의 본질인 '수담'을 즐기기 위해 기획되었습니다. 
+    기존의 복잡한 바둑 앱들과 달리, <strong>설치 없이 브라우저에서 즉시 실행</strong>되며, AI와 협업하여 코딩한 '인간 친화적' 인터페이스가 특징입니다. 
+    자세한 개발 과정과 AI 비서 활용법은 제 블로그(<a href="https://aisojang.tistory.com" target="_blank" style="color: var(--accent);">aisojang.tistory.com</a>)에서 확인하실 수 있습니다.
+  </div>
+
+  <div class="manual-section" style="width: 100%; font-size: 0.85rem; margin-bottom: 20px; color: #ddd;">
+    <h3 style="color: #fff; font-size: 1rem; margin-bottom: 10px;">🎮 이용 방법 및 특징</h3>
+    <ul style="padding-left: 20px; margin: 0;">
+      <li><strong>모드 전환:</strong> 버튼 하나로 19줄 바둑과 5목(오목) 모드를 자유롭게 오갈 수 있습니다.</li>
+      <li><strong>수동 계가:</strong> 승패 판정 시스템에 의존하지 않고 사용자가 직접 집을 세며 바둑의 깊이를 느낄 수 있도록 설계되었습니다.</li>
+      <li><strong>무설치/무광고:</strong> 불필요한 회원가입이나 설치 없이 링크 공유만으로 즉시 친구와 대국이 가능합니다.</li>
+    </ul>
+  </div>
+  <div id="status">흑의 차례 (바둑) | 잡은 돌 - 흑: 0 백: 0</div>  <div class="board-container">
     <canvas id="goBoard"></canvas>
   </div>
   <div class="btn-group">
