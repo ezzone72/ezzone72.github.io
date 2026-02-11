@@ -4,41 +4,48 @@
   <meta charset="utf-8" />
   <title>세계 바둑 랭킹 - 내 손안의 바둑판</title>
   <style>
-    body { background: #0f172a; color: white; margin: 0; font-family: sans-serif; }
-    .header { padding: 20px; text-align: center; background: #1e293b; }
+    body { background: #0f172a; color: white; margin: 0; font-family: sans-serif; overflow-x: hidden; }
+    .header { padding: 20px; text-align: center; background: #1e293b; position: relative; z-index: 10; border-bottom: 1px solid #334155; }
+    
+    /* 핵심: 외부 사이트를 담는 틀 */
     .ranking-frame-container {
       width: 100%;
-      max-width: 800px;
-      margin: 20px auto;
-      height: 800px; /* 보여줄 높이 */
-      overflow: hidden; /* 영역 밖 숨기기 */
+      max-width: 900px; /* 테이블 폭에 맞춰 조절 가능 */
+      margin: 0 auto;
+      height: 85vh; /* 화면 높이에 맞춰 설정 */
+      overflow: hidden; /* 영역 밖 광고들 다 잘라버림 */
       position: relative;
-      border-radius: 12px;
-      border: 1px solid #334155;
+      background: #fff; /* 상대 사이트 배경색 */
     }
+
     iframe {
-      width: 100%;
-      height: 1500px; /* 실제 사이트 전체 높이 */
+      width: 1200px; /* 원본 사이트 폭보다 넓게 설정해서 사이드 광고 밀어내기 */
+      height: 2500px; 
       border: none;
       position: absolute;
-      top: -160px; /* 상단 메뉴 잘라내기 (조정 가능) */
-      left: 0;
+      
+      /* [중요] 상단 광고 및 메뉴 잘라내기 수치 */
+      top: -165px; 
+      
+      /* [중요] 왼쪽 메뉴나 여백 잘라내기 (필요시 조정) */
+      left: -150px; 
     }
-    .back-btn { color: #888; text-decoration: none; font-size: 0.8rem; }
+    
+    .back-btn { color: #888; text-decoration: none; font-size: 0.8rem; border: 1px solid #334155; padding: 5px 10px; border-radius: 5px; }
   </style>
 </head>
 <body>
   <div class="header">
-    <a href="index.html" class="back-btn">← 메인으로 돌아가기</a>
-    <h2 style="color: #facd0d;">세계 바둑 랭킹 실시간 연동</h2>
+    <a href="index.html" class="back-btn">← 메인으로</a>
+    <h2 style="color: #facd0d; margin: 15px 0 0 0;">실시간 세계 바둑 랭킹</h2>
   </div>
 
   <div class="ranking-frame-container">
-    <iframe src="https://www.goratings.org/en/"></iframe>
+    <iframe src="https://www.goratings.org/en/" scrolling="yes"></iframe>
   </div>
   
-  <p style="text-align: center; color: #666; font-size: 0.8rem;">
-    출처: Go Ratings (실시간 데이터 연동 중)
+  <p style="text-align: center; color: #666; font-size: 0.75rem; padding: 10px;">
+    데이터 제공: Go Ratings (실시간 연동 중)
   </p>
 </body>
 </html>
