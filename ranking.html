@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>세계 바둑 랭킹 - 내 손안의 바둑판</title>
+  <style>
+    body { background: #0f172a; color: white; margin: 0; font-family: sans-serif; }
+    .header { padding: 20px; text-align: center; background: #1e293b; }
+    .ranking-frame-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+      height: 800px; /* 보여줄 높이 */
+      overflow: hidden; /* 영역 밖 숨기기 */
+      position: relative;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+    iframe {
+      width: 100%;
+      height: 1500px; /* 실제 사이트 전체 높이 */
+      border: none;
+      position: absolute;
+      top: -160px; /* 상단 메뉴 잘라내기 (조정 가능) */
+      left: 0;
+    }
+    .back-btn { color: #888; text-decoration: none; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <a href="index.html" class="back-btn">← 메인으로 돌아가기</a>
+    <h2 style="color: #facd0d;">세계 바둑 랭킹 실시간 연동</h2>
+  </div>
+
+  <div class="ranking-frame-container">
+    <iframe src="https://www.goratings.org/en/"></iframe>
+  </div>
+  
+  <p style="text-align: center; color: #666; font-size: 0.8rem;">
+    출처: Go Ratings (실시간 데이터 연동 중)
+  </p>
+</body>
+</html>
