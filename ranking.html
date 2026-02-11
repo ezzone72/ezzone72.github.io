@@ -3,36 +3,45 @@
 <head>
   <meta charset="utf-8" />
   <title>세계 바둑 랭킹 - 내 손안의 바둑판</title>
-  <style>
-    body { background: #0f172a; color: white; margin: 0; font-family: sans-serif; overflow-x: hidden; }
-    .header { padding: 20px; text-align: center; background: #1e293b; position: relative; z-index: 10; border-bottom: 1px solid #334155; }
-    
-    /* 핵심: 외부 사이트를 담는 틀 */
-    .ranking-frame-container {
-      width: 100%;
-      max-width: 900px; /* 테이블 폭에 맞춰 조절 가능 */
-      margin: 0 auto;
-      height: 85vh; /* 화면 높이에 맞춰 설정 */
-      overflow: hidden; /* 영역 밖 광고들 다 잘라버림 */
-      position: relative;
-      background: #fff; /* 상대 사이트 배경색 */
-    }
+<style>
+  /* 틀은 그대로 유지 */
+  .ranking-frame-container {
+    width: 100%;
+    max-height: 80vh; 
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    background: #fff;
+    border: 1px solid #334155;
+  }
 
-    iframe {
-      width: 1200px; /* 원본 사이트 폭보다 넓게 설정해서 사이드 광고 밀어내기 */
-      height: 1500px; 
-      border: none;
-      position: absolute;
-      
-      /* [중요] 상단 광고 및 메뉴 잘라내기 수치 */
-      top: -600px; 
-      
-      /* [중요] 왼쪽 메뉴나 여백 잘라내기 (필요시 조정) */
-      left: -150px; 
-    }
+  /* 핵심: 모바일에서 화면을 줌(Zoom) 시키는 마법 */
+  iframe {
+    width: 100%; /* 기본 가로 */
+    height: 1500px;
+    border: none;
+    position: absolute;
+    top: -620px; /* 상단 광고 컷 */
+    left: 0;
     
-    .back-btn { color: #888; text-decoration: none; font-size: 0.8rem; border: 1px solid #334155; padding: 5px 10px; border-radius: 5px; }
-  </style>
+    /* 모바일용 줌 설정 */
+    transform-origin: 0 0; 
+  }
+
+  /* 모바일(화면 폭 600px 이하)일 때만 작동 */
+  @media (max-width: 600px) {
+    iframe {
+      width: 250%; /* 가로를 2.5배 넓게 설정해서 */
+      height: 1500px;
+      transform: scale(0.4); /* 0.4배로 축소하면 글자가 모바일 사이즈에 맞게 커보임 */
+      top: -629px; /* 모바일에서는 잘리는 높이가 다를 수 있으니 미세조정 */
+      left: -20px;
+    }
+    .ranking-frame-container {
+      height: 70vh; /* 모바일에서 틀 높이 조절 */
+    }
+  }
+</style>
 </head>
 <body>
   <div class="header">
@@ -49,6 +58,7 @@
   </p>
 </body>
 </html>
+
 
 
 
